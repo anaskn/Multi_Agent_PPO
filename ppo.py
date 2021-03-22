@@ -77,12 +77,12 @@ class ActorCritic(nn.Module):
         x = torch.tanh(self.actor_fc1(state))
         x = torch.tanh(self.actor_fc2(x))
         x = torch.tanh(self.actor_fc3(x))
-        mu = torch.tanh(self.actor_mu(x))
+        mu = torch.sigmoid(self.actor_mu(x))
         sigma = F.softplus(self.actor_sigma(x))
 
         v = torch.tanh(self.critic_fc1(state))
         v = torch.tanh(self.critic_fc2(v))
-        v = torch.tanh(self.critic_fc3(v))
+        v = torch.sigmoid(self.critic_fc3(v))
         state_value = self.critic_value(v)
 
         return mu, sigma, state_value 
@@ -95,6 +95,9 @@ class ActorCritic(nn.Module):
         cov_mat = torch.diag_embed(action_var)
         dist = MultivariateNormal(action_mu, cov_mat)
         action = dist.sample()
+        #print("act bef = ", action)
+        action = np.clip(action, 0, 1)
+        #print("act aft = ", action)
         log_prob = dist.log_prob(action)
 
         return action.detach(), log_prob.detach()
