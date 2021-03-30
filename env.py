@@ -174,7 +174,7 @@ class ContentCaching(gym.Env):
 		R_c = variable[0]
 		C_o = variable[1]
 		C_u = variable[2]
-		fact_k = variable[3]	
+		fact_k = variable[3]
 
 		unused_shared = []
 		unused_own = []
@@ -198,11 +198,7 @@ class ContentCaching(gym.Env):
 
 						action = action[0]
 						cache1=cache1+(max(0,(self.request[i][nei_tab[i][zz][y]]-((1-action[nei_tab[i][zz][y]])*self.caching_cap[nei_tab[i][zz][y]]))/len(nei_tab[i][nei_tab[i][zz][y]])) )
-						
-
-
-
-						
+								
 
 
 			if len(nei_tab[i][zz]) == 0 :
@@ -247,7 +243,7 @@ class ContentCaching(gym.Env):
 			#print("f2 = ", float(max(0, (action[zz]*self.caching_cap[zz])-self.request[i][zz] )))
 			#print("unused_own = ", float(max(0, (action[zz]*self.caching_cap[zz])-self.request[i][zz] )))
 
-
+			#print("action "== action[zz])
 
 
 

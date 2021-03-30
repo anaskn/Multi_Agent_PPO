@@ -3,7 +3,6 @@ from unityagents import UnityEnvironment
  #   EngineConfigurationChannel,
 #)
 
-
 import torch
 import numpy as np
 from collections import deque
@@ -32,7 +31,6 @@ def test_data(cpt):
 
 
 def train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test, num_agents=20,steps_per_epoch=20, epochs=100, ttl_var = 3):
-
 
 
     env_name = "Reacher"
@@ -113,7 +111,7 @@ def train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test, num_agents=
                 actions, log_probs = agent.select_action(states)
                 
                 r, unused_shared, unused_own = env.step(actions.data.numpy().flatten(),nei_tab, t, variable)
-
+          
                 reward_step.append(np.mean(r))
                 unused_shared_step.append(unused_shared)
                 unused_own_step.append(unused_own)
@@ -169,7 +167,7 @@ def train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test, num_agents=
             #print(" sct = ", actions.data.numpy().flatten())
             #print("action = ",len(actions))
 
-            variable= [8,8,8,8]
+            
             rewards, x , y = env.step(actions.data.numpy().flatten(),nei_tab, t, variable)#[brain_name]           # send all actions to tne environment
             reward_step.append(np.mean(rewards))
             states = env._next_observation(nei_tab, t, ttl_var)         # get next state (for each agent)
@@ -266,7 +264,8 @@ if __name__ == '__main__':
         # read the data as binary data stream
         nei_tab = pickle.load(filehandle)
 
-    rewards_train, reward_test = train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test, num_agents=20,steps_per_epoch=20, epochs=1000, ttl_var = 3)
+    reward_test, unused_shared_tab_test , unused_own_tab_test, rewards_train = train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test,
+                                                                                num_agents=20,steps_per_epoch=20, epochs=1000, ttl_var = 3)
 
 
 

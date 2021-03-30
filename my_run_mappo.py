@@ -32,7 +32,7 @@ if __name__ == '__main__':
 	parser.add_argument('--steps', type=int, default=20)
 	parser.add_argument('--epochs', type=int, default=200)#400
 	parser.add_argument('--num_test_episodes', type=int, default=1)
-	parser.add_argument('--ttl_var', type=int, default=3)
+	parser.add_argument('--ttl_var', type=int, default=5)
 	args = parser.parse_args()
 
 
@@ -66,12 +66,13 @@ if __name__ == '__main__':
 		algo_unused_own_cut = []
 
 		variable = [1,2,4,6,8,10,12,14,16,18,20,25,30,35,40,45,50,55,60] #[1,10,20,60,150,400,700,1000] #
+		#variable = [1,100]
 
 
 		
 
 		#for algo in algo_lst:
-		for para in want:#want 
+		for para in range(len(pdf_plot)):#want:#want 
 
 			scoress = []
 
@@ -98,6 +99,7 @@ if __name__ == '__main__':
 				for loop in range(2):#loop over each variable ##########
 
 					parameters[para][para]= variable[x]
+					print("parameters[para] = ",  parameters[para])
 
 					all_reward_test = []
 					all_unused_shared = []
@@ -126,7 +128,7 @@ if __name__ == '__main__':
 																	num_test_episodes= args.num_test_episodes, logger_kwargs=logger_kwargs)
 						if algo == 'mappo':
 							#ddpg
-							reward_test, unused_shared, unused_own, reward_train = train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test, num_agents=20,
+							reward_test, unused_shared, unused_own, reward_train = train_mappo(lst, nei_tab, cpt, parameters[para], lst_test, nei_tab_test, num_agents=20,
 																	steps_per_epoch=args.steps, epochs=args.epochs, ttl_var = args.ttl_var)
 							
     
@@ -171,6 +173,7 @@ if __name__ == '__main__':
 
 		
 		times = [1,2,4,6,8,10,12,14,16,18,20,25,30,35,40,45,50,55,60]
+		#times = [1,100]
 		#times = [2,4,6,8,10,12,14,16,18,20]
 		#print("algo_reward_test == ", algo_reward_test)
 		#print("total_unused_shared == ", algo_unused_shared)
@@ -195,12 +198,12 @@ if __name__ == '__main__':
 
 		
 		# save file .pdf
-		plt.savefig('plot/07_five_all_'+pdf_plot[para]+'_plot.pdf') #relusigmoid
+		plt.savefig('plot/z1_five_all_mappo_plot.pdf') #relusigmoid
 
 
 		#to stock data 
 		our_file = [algo_unused_shared[0],algo_unused_shared[1],algo_unused_shared[2],algo_unused_shared[3]]#, algo_unused_shared[1], algo_unused_own[1], algo_unused_shared[2], algo_unused_own[2] ]
-		with open('model/07_five_all_'+pdf_plot[para]+'.data', 'wb') as filehandle: #ddpg4442 #ddpg6664
+		with open('model/z1_five_all_mappo.data', 'wb') as filehandle: #ddpg4442 #ddpg6664
 		#  # store the data as binary data stream
 			pickle.dump(our_file, filehandle)
 		
@@ -212,12 +215,12 @@ if __name__ == '__main__':
 		print("End")
 
 		
-
+		"""
 		#plot only the last one 
 		plt.plot(times , algo_unused_shared_cut[0], color='orange', linestyle='dotted', marker='x' ,label='$R_c$') #  unused shared  
-		plt.plot(times , algo_unused_shared_cut[1], color='purple', linestyle='-', marker='+' ,label='$C_o$') # unused own 
-		plt.plot(times , algo_unused_shared_cut[2], color='red', linestyle='dashed', marker='D' ,label='$C_u$') #  unused shared  
-		plt.plot(times , algo_unused_shared_cut[3], color='green', linestyle='dashdot', marker='*' ,label='$k$') # unused own 
+		#plt.plot(times , algo_unused_shared_cut[1], color='purple', linestyle='-', marker='+' ,label='$C_o$') # unused own 
+		#plt.plot(times , algo_unused_shared_cut[2], color='red', linestyle='dashed', marker='D' ,label='$C_u$') #  unused shared  
+		#plt.plot(times , algo_unused_shared_cut[3], color='green', linestyle='dashdot', marker='*' ,label='$k$') # unused own 
 		
 
 		plt.ylabel('', size= 8 ) #'$U_{nused}$' #Reward
@@ -230,20 +233,22 @@ if __name__ == '__main__':
 		plt.legend()
 		
 		# save file .pdf
-		plt.savefig('plot/07_last_all_'+pdf_plot[para]+'_plot.pdf') #relusigmoid
+		#plt.savefig('plot/07_last_all_'+pdf_plot[para]+'_plot.pdf') #relusigmoid
 
 
 		#to stock data 
-		our_file = [algo_unused_shared_cut[0], algo_unused_shared_cut[1],algo_unused_shared_cut[2],algo_unused_shared_cut[3]]#, algo_unused_shared_cut[1], algo_unused_own_cut[1], algo_unused_shared_cut[2], algo_unused_own_cut[2]]
-		with open('model/07_last_rc_all_'+pdf_plot[para]+'.data', 'wb') as filehandle: 
+		#our_file = [algo_unused_shared_cut[0], algo_unused_shared_cut[1],algo_unused_shared_cut[2],algo_unused_shared_cut[3]]#, algo_unused_shared_cut[1], algo_unused_own_cut[1], algo_unused_shared_cut[2], algo_unused_own_cut[2]]
+		#with open('model/07_last_rc_all_'+pdf_plot[para]+'.data', 'wb') as filehandle: 
 		#  # store the data as binary data stream
-			pickle.dump(our_file, filehandle)
+		#	pickle.dump(our_file, filehandle)
 		
 		
 
-		#plt.show()
+		plt.show()
 
 		plt.close()
 		print("End")
+
+		"""
 		
 		
