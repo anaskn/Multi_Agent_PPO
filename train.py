@@ -1,7 +1,4 @@
 from unityagents import UnityEnvironment
-#from mlagents_envs.side_channel.engine_configuration_channel import (
- #   EngineConfigurationChannel,
-#)
 
 import torch
 import numpy as np
