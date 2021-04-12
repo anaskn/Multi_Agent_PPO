@@ -179,6 +179,8 @@ class ContentCaching(gym.Env):
 		unused_shared = []
 		unused_own = []
 		nei_request_tab = []
+		unsatisfied_shared = []
+		unsatisfied_own =[]
 
 		# compute : sum(D_j(1-a_j)*G_j)/N_j
 		for zz in range(len(action)):
@@ -234,8 +236,8 @@ class ContentCaching(gym.Env):
 			
 			
 			#unused_shared
-			unused_shared.append( float(max(0,(1-action[zz])*self.caching_cap[zz] - cache1 )) + float(max(0, (action[zz]*self.caching_cap[zz])-self.request[i][zz] )) )
-			#unused_shared.append( float(max(0,(1-action[zz])*self.caching_cap[zz] - cache1  )))
+			#unused_shared.append( float(max(0,(1-action[zz])*self.caching_cap[zz] - cache1 )) + float(max(0, (action[zz]*self.caching_cap[zz])-self.request[i][zz] )) )
+			unused_shared.append( float(max(0,(1-action[zz])*self.caching_cap[zz] - cache1  )))
 			
 
 			#unused_own
@@ -244,6 +246,10 @@ class ContentCaching(gym.Env):
 			#print("unused_own = ", float(max(0, (action[zz]*self.caching_cap[zz])-self.request[i][zz] )))
 
 			#print("action "== action[zz])
+
+			unsatisfied_shared.append(float(max(0,cache1-  (1-action[zz])*self.caching_cap[zz])))
+
+			unsatisfied_own.append(float(max(0,self.request[i][zz] - action[zz]*self.caching_cap[zz])))
 
 
 
@@ -276,9 +282,9 @@ class ContentCaching(gym.Env):
 				+ min(self.neigbors_request[zz], (((1-action[zz])*100) * self.caching_cap[zz]) / 100.0)
 			
 
-		return 	reward, statistics.mean(unused_shared), statistics.mean(unused_own)#, np.mean(nei_demand), np.mean(my_demand), np.mean(nei_number)
+		#˝ˇreturn 	reward, statistics.mean(unused_shared), statistics.mean(unused_own)#, np.mean(nei_demand), np.mean(my_demand), np.mean(nei_number)
 
-	 
+		return 	reward, statistics.mean(unused_shared), statistics.mean(unused_own),  max(unsatisfied_shared), max(unsatisfied_own)	 
 
 
 

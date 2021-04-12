@@ -32,6 +32,10 @@ def train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test, num_agents=
 
     env_name = "Reacher"
 
+    seed =0
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+
     n_agents = num_agents
     n_episodes = epochs
     max_steps = steps_per_epoch
@@ -94,11 +98,15 @@ def train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test, num_agents=
         reward_epoch = []
         unused_shared_tab = []
         unused_own_tab = []
+        unsatisfied_shared_tab =[]
+        unsatisfied_own_tab = []
         num_test_episodes = 1
         for j in range(num_test_episodes):
             reward_step = []
             unused_shared_step = []
             unused_own_step = []
+            unsatisfied_shared_step =[]
+            unsatisfied_own_step = []
           
             states = env.reset()#[brain_name]
             states = torch.FloatTensor(states)
@@ -107,11 +115,13 @@ def train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test, num_agents=
                 # Take deterministic actions at test time (noise_scale=0)
                 actions, log_probs = agent.select_action(states)
                 
-                r, unused_shared, unused_own = env.step(actions.data.numpy().flatten(),nei_tab, t, variable)
+                r, unused_shared, unused_own, unsatisfied_shared, unsatisfied_own = env.step(actions.data.numpy().flatten(),nei_tab, t, variable)
           
                 reward_step.append(np.mean(r))
                 unused_shared_step.append(unused_shared)
                 unused_own_step.append(unused_own)
+                unsatisfied_shared_step.append(unsatisfied_shared)
+                unsatisfied_own_step.append(unsatisfied_own)
 
                 states = env._next_observation(nei_tab, t, ttl_var)
                 states = torch.FloatTensor(states)
@@ -120,9 +130,11 @@ def train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test, num_agents=
             reward_epoch.append(np.mean(reward_step))
             unused_shared_tab.append(np.mean(unused_shared_step))
             unused_own_tab.append(np.mean(unused_own_step))
+            unsatisfied_shared_tab.append(np.mean(unsatisfied_shared_step))
+            unsatisfied_own_tab.append(np.mean(unsatisfied_own_step))
 
 
-        return reward_epoch, unused_shared_tab , unused_own_tab
+        return reward_epoch, unused_shared_tab , unused_own_tab, unsatisfied_shared_tab, unsatisfied_own_tab
 
 
 
@@ -130,6 +142,8 @@ def train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test, num_agents=
     reward_epoch_tab_test = []
     unused_shared_tab_test = []
     unused_own_tab_test = []
+    unsatisfied_shared_tab_test = []
+    unsatisfied_own_tab_test = []
 
     reward_episode = []
     for n_episode in range(1, n_episodes+1):
@@ -165,17 +179,19 @@ def train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test, num_agents=
             #print("action = ",len(actions))
 
             
-            rewards, x , y = env.step(actions.data.numpy().flatten(),nei_tab, t, variable)#[brain_name]           # send all actions to tne environment
+            rewards, x , y, xx, yy = env.step(actions.data.numpy().flatten(),nei_tab, t, variable)#[brain_name]           # send all actions to tne environment
             reward_step.append(np.mean(rewards))
             states = env._next_observation(nei_tab, t, ttl_var)         # get next state (for each agent)
             #rewards = env_info.rewards                         # get reward (for each agent)
             if t == 19:
                 dones = [True]*20#:env_info.local_done
                 reward_episode.append(np.mean(reward_step)) 
-                reward_epoch_step_test, unused_shared_step_test , unused_own_step_test = test_agent(nei_tab_test, variable)
+                reward_epoch_step_test, unused_shared_step_test , unused_own_step_test , unsatisfied_shared_step_test, unsatisfied_own_step_test= test_agent(nei_tab_test, variable)
                 reward_epoch_tab_test.append(np.mean(reward_epoch_step_test))
                 unused_shared_tab_test.append(np.mean(unused_shared_step_test))
                 unused_own_tab_test.append(np.mean(unused_own_step_test))
+                unsatisfied_shared_tab_test.append(np.mean(unsatisfied_shared_step_test))
+                unsatisfied_own_tab_test.append(np.mean(unsatisfied_own_step_test))
 
             else:
                 dones = [False]*20 
@@ -239,7 +255,7 @@ def train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test, num_agents=
             
         total_reward = 0
 
-    return reward_epoch_tab_test, unused_shared_tab_test , unused_own_tab_test, reward_episode
+    return reward_epoch_tab_test, unused_shared_tab_test , unused_own_tab_test, reward_episode, unsatisfied_shared_tab_test, unsatisfied_own_tab_test
 
 
 
@@ -261,7 +277,7 @@ if __name__ == '__main__':
         # read the data as binary data stream
         nei_tab = pickle.load(filehandle)
 
-    reward_test, unused_shared_tab_test , unused_own_tab_test, rewards_train = train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test,
+    reward_test, unused_shared_tab_test , unused_own_tab_test, rewards_train, unsatisfied_shared, unsatisfied_own= train_mappo(lst, nei_tab, cpt, variable, lst_test, nei_tab_test,
                                                                                 num_agents=20,steps_per_epoch=20, epochs=1000, ttl_var = 3)
 
 
